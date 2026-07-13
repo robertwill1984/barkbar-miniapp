@@ -1,0 +1,1543 @@
+openapi: 3.0.3
+info:
+  title: Bark & Bar 微信小程序 API
+  version: 1.0.0
+  description: |
+    Bark & Bar 系统 V1.0 开发基线接口。该文件覆盖首期核心业务动作，
+    具体字段以 PRD V1.1、数据库设计 V1.1 和业务规则文档为准。
+servers:
+  - url: https://api.example.com/api/v1
+    description: production placeholder
+  - url: https://staging-api.example.com/api/v1
+    description: staging placeholder
+tags:
+  - name: CustomerAuth
+  - name: CustomerPets
+  - name: CustomerAgreements
+  - name: CustomerReservations
+  - name: CustomerCards
+  - name: CustomerOrders
+  - name: CustomerRefunds
+  - name: AdminAuth
+  - name: AdminWorkbench
+  - name: AdminReservations
+  - name: AdminAdmissions
+  - name: AdminCards
+  - name: AdminRefunds
+  - name: AdminInventory
+  - name: AdminFinance
+  - name: AdminConfig
+security:
+  - bearerAuth: []
+paths:
+  /customer/auth/wechat-login:
+    post:
+      tags: [CustomerAuth]
+      summary: 微信登录
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WechatLoginRequest'
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+  /admin/auth/pin-login:
+    post:
+      tags: [AdminAuth]
+      summary: 本地员工/老板 PIN 登录
+      description: 本地开发阶段用于替代真实微信员工权限；正式上线需替换为微信身份、员工表和角色权限校验。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffPinLoginRequest'
+      responses:
+        '200':
+          description: 本地员工身份
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffPinLoginResponse'
+  /admin/auth/session:
+    post:
+      tags: [AdminAuth]
+      summary: 本地员工/老板会话校验
+      description: 本地开发阶段用于校验 `staff_token` 是否仍有效，并返回当前角色和权限；旧 `staff_pin` 暂保留兼容。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffSessionRequest'
+      responses:
+        '200':
+          description: 会话有效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffPinLoginResponse'
+  /customer/auth/phone:
+    post:
+      tags: [CustomerAuth]
+      summary: 绑定或更新微信手机号
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone_code]
+              properties:
+                phone_code:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /customer/pets:
+    get:
+      tags: [CustomerPets]
+      summary: 获取我的宠物档案
+      responses:
+        '200':
+          description: 宠物列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Pet'
+    post:
+      tags: [CustomerPets]
+      summary: 新增宠物档案
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /customer/agreements/required:
+    get:
+      tags: [CustomerAgreements]
+      summary: 查询预约前必须确认的协议
+      responses:
+        '200':
+          description: 必签协议
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequiredAgreementsResponse'
+  /customer/agreements/{agreement_id}/accept:
+    post:
+      tags: [CustomerAgreements]
+      summary: 签署协议并保存证据快照
+      parameters:
+        - $ref: '#/components/parameters/AgreementId'
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version, accepted]
+              properties:
+                version:
+                  type: string
+                accepted:
+                  type: boolean
+                device_info:
+                  type: object
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /customer/reservation-slots:
+    get:
+      tags: [CustomerReservations]
+      summary: 查询可预约时段
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: 可预约时段
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationSlotsResponse'
+  /customer/reservations:
+    get:
+      tags: [CustomerReservations]
+      summary: 查询我的预约
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 我的预约列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+    post:
+      tags: [CustomerReservations]
+      summary: 创建预约
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReservationRequest'
+      responses:
+        '200':
+          description: 预约创建结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateReservationResponse'
+  /customer/reservations/{reservation_id}/cancel:
+    post:
+      tags: [CustomerReservations]
+      summary: 取消预约或申请改期
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, reason]
+              properties:
+                user_id: { type: string }
+                reason: { type: string }
+                request_reschedule: { type: boolean }
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /customer/reservations/{reservation_id}/checkin-code:
+    post:
+      tags: [CustomerReservations]
+      summary: 生成60秒到店核验码
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id]
+              properties:
+                user_id: { type: string }
+      responses:
+        '200':
+          description: 到店核验码
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservation_id: { type: string }
+                  code: { type: string }
+                  expires_in_seconds: { type: integer }
+                  expires_at: { type: string, format: date-time }
+  /customer/cards:
+    get:
+      tags: [CustomerCards]
+      summary: 查询我的会员卡
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 会员卡列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardsResponse'
+  /customer/cards/{card_id}/redemption-code:
+    post:
+      tags: [CustomerCards]
+      summary: 生成60秒动态核销码
+      parameters:
+        - $ref: '#/components/parameters/CardId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id]
+              properties:
+                user_id: { type: string }
+      responses:
+        '200':
+          description: 动态码
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedemptionCodeResponse'
+  /customer/products:
+    get:
+      tags: [CustomerOrders]
+      summary: 查询可售商品和票卡
+      parameters:
+        - name: scene
+          in: query
+          schema:
+            type: string
+            enum: [ticket, card, bar, retail]
+      responses:
+        '200':
+          description: 商品列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsResponse'
+  /customer/orders:
+    get:
+      tags: [CustomerOrders]
+      summary: 查询我的本地订单
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema: { type: string }
+        - name: scene
+          in: query
+          schema:
+            type: string
+            enum: [ticket, card, bar, retail]
+      responses:
+        '200':
+          description: 订单列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      tags: [CustomerOrders]
+      summary: 创建本地模拟支付订单
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: 下单结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrderResponse'
+  /customer/orders/{order_id}/payment:
+    get:
+      tags: [CustomerOrders]
+      summary: 查询本地订单支付状态
+      description: 微信支付接入前的本地支付状态查询边界；当前返回 LOCAL_MOCK 支付结果，后续可替换为微信支付回调和主动查询结果。
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: user_id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 支付状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStatusResponse'
+  /customer/refunds:
+    get:
+      tags: [CustomerRefunds]
+      summary: 查询我的退款或售后申请
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema: { type: string }
+        - name: source_id
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: 退款申请列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Refund'
+    post:
+      tags: [CustomerRefunds]
+      summary: 提交本地退款或售后申请
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRefundRequest'
+      responses:
+        '200':
+          description: 退款申请结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRefundResponse'
+  /customer/refunds/{refund_id}/status:
+    get:
+      tags: [CustomerRefunds]
+      summary: 查询单笔退款或售后状态
+      parameters:
+        - $ref: '#/components/parameters/RefundId'
+        - name: user_id
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 退款状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundStatusResponse'
+  /admin/workbench/today:
+    get:
+      tags: [AdminWorkbench]
+      summary: 今日工作台
+      responses:
+        '200':
+          description: 今日运营摘要
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminWorkbenchResponse'
+  /admin/orders:
+    get:
+      tags: [AdminCards]
+      summary: 员工查询本地订单
+      parameters:
+        - name: staff_token
+          in: query
+          required: false
+          description: 本地员工 token；优先使用。旧 staff_pin 暂保留兼容。
+          schema: { type: string }
+        - name: staff_pin
+          in: query
+          required: false
+          schema: { type: string }
+        - name: user_id
+          in: query
+          required: false
+          schema: { type: string }
+        - name: scene
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ticket, card, bar, retail]
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PAID, CANCELED, REFUND_REQUESTED]
+      responses:
+        '200':
+          description: 订单列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+  /admin/cards:
+    get:
+      tags: [AdminCards]
+      summary: 员工查询会员卡
+      parameters:
+        - name: staff_token
+          in: query
+          required: false
+          description: 本地员工 token；优先使用。旧 staff_pin 暂保留兼容。
+          schema: { type: string }
+        - name: staff_pin
+          in: query
+          required: false
+          schema: { type: string }
+        - name: user_id
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ACTIVE, EXPIRED, FROZEN]
+      responses:
+        '200':
+          description: 会员卡列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MemberCard'
+  /admin/reservations:
+    get:
+      tags: [AdminReservations]
+      summary: 查询员工端预约列表
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PENDING_REVIEW, CONFIRMED, CANCELED, RESCHEDULE_REQUESTED, REJECTED, CHECKED_IN]
+        - name: staff_pin
+          in: query
+          required: false
+          schema: { type: string }
+        - name: staff_token
+          in: query
+          required: false
+          description: 本地员工 token；优先使用。旧 staff_pin 暂保留兼容。
+          schema: { type: string }
+      responses:
+        '200':
+          description: 预约列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+  /admin/reservations/{reservation_id}/review:
+    post:
+      tags: [AdminReservations]
+      summary: 员工审核预约或改期申请
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [APPROVE, REJECT]
+                staff_pin: { type: string }
+                staff_token: { type: string }
+                note: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/reservations/{reservation_id}/checkin:
+    post:
+      tags: [AdminReservations]
+      summary: 员工确认到店核验
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                staff_pin: { type: string }
+                staff_token: { type: string }
+                note: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/reservations/verify-code:
+    post:
+      tags: [AdminAdmissions]
+      summary: 员工用动态核验码确认到店
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                staff_pin: { type: string }
+                staff_token: { type: string }
+                code: { type: string }
+                note: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/admissions/check-in:
+    post:
+      tags: [AdminAdmissions]
+      summary: 到店签到和现场安全核验
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckInRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/redemptions/consume-code:
+    post:
+      tags: [AdminAdmissions]
+      summary: 员工核销会员动态码
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsumeCodeRequest'
+      responses:
+        '200':
+          description: 核销结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsumeCodeResponse'
+  /admin/offline-admissions:
+    post:
+      tags: [AdminAdmissions]
+      summary: 店长创建弱网待补录入园记录
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineAdmissionRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/offline-admissions/{offline_id}/post:
+    post:
+      tags: [AdminAdmissions]
+      summary: 网络恢复后补录入账
+      parameters:
+        - name: offline_id
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/refunds:
+    get:
+      tags: [AdminRefunds]
+      summary: 员工查询退款或售后申请
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PENDING_REVIEW, APPROVED, REJECTED, CANCELED]
+        - name: staff_pin
+          in: query
+          required: false
+          schema: { type: string }
+        - name: staff_token
+          in: query
+          required: false
+          description: 本地员工 token；优先使用。旧 staff_pin 暂保留兼容。
+          schema: { type: string }
+      responses:
+        '200':
+          description: 退款申请列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Refund'
+  /admin/refunds/{refund_id}/review:
+    post:
+      tags: [AdminRefunds]
+      summary: 员工审核退款或售后申请
+      parameters:
+        - $ref: '#/components/parameters/RefundId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRefundRequest'
+      responses:
+        '200':
+          description: 审核后的退款申请
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+  /admin/inventory/movements:
+    post:
+      tags: [AdminInventory]
+      summary: 新增库存流水
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryMovementRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/expenses:
+    post:
+      tags: [AdminFinance]
+      summary: 提交运营支出
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/expenses/{expense_id}/approve:
+    post:
+      tags: [AdminFinance]
+      summary: 支出审批
+      parameters:
+        - name: expense_id
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/expenses/{expense_id}/pay:
+    post:
+      tags: [AdminFinance]
+      summary: 支出付款登记
+      parameters:
+        - name: expense_id
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cash_account_id, paid_amount_cents, paid_at]
+              properties:
+                cash_account_id: { type: string }
+                paid_amount_cents: { type: integer, format: int64 }
+                paid_at: { type: string, format: date-time }
+                payment_note: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/reports/overview:
+    get:
+      tags: [AdminFinance]
+      summary: 老板经营总览
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: 经营总览
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportOverviewResponse'
+  /admin/finance/overview:
+    get:
+      tags: [AdminFinance]
+      summary: 财务分析总览
+      description: 汇总现金流、内部经营利润和分红依据；内部经营口径不等同法定会计利润或税务利润。
+      parameters:
+        - name: staff_token
+          in: query
+          required: false
+          description: 本地老板 token；优先使用。旧 staff_pin 暂保留兼容。
+          schema: { type: string }
+        - name: staff_pin
+          in: query
+          required: false
+          description: 本地老板 PIN；正式上线后替换为真实老板权限。
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: 财务分析总览
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceOverviewResponse'
+  /admin/finance/profit:
+    get:
+      tags: [AdminFinance]
+      summary: 内部经营利润测算
+      description: 基于内部经营收入、商品成本、会员履约成本、营销成本和运营支出测算；不自动作为法定可分红利润。
+      parameters:
+        - name: staff_token
+          in: query
+          required: false
+          description: 本地老板 token；优先使用。旧 staff_pin 暂保留兼容。
+          schema: { type: string }
+        - name: staff_pin
+          in: query
+          required: false
+          description: 本地老板 PIN；正式上线后替换为真实老板权限。
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: 利润测算
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceProfitResponse'
+  /admin/finance/dividend-basis:
+    get:
+      tags: [AdminFinance]
+      summary: 股东分红依据测算
+      description: 给老板和股东提供分红前测算依据；系统只提供上限建议和风险提示，不自动决定分红。
+      parameters:
+        - name: staff_token
+          in: query
+          required: false
+          description: 本地老板 token；优先使用。旧 staff_pin 暂保留兼容。
+          schema: { type: string }
+        - name: staff_pin
+          in: query
+          required: false
+          description: 本地老板 PIN；正式上线后替换为真实老板权限。
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: 分红依据
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DividendBasisResponse'
+  /admin/config/capacity-rules:
+    get:
+      tags: [AdminConfig]
+      summary: 查询容量规则
+      responses:
+        '200':
+          $ref: '#/components/responses/PagedOk'
+    post:
+      tags: [AdminConfig]
+      summary: 新增容量规则版本
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapacityRuleInput'
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    RequestId:
+      name: X-Request-Id
+      in: header
+      required: true
+      schema: { type: string }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string }
+    AgreementId:
+      name: agreement_id
+      in: path
+      required: true
+      schema: { type: string }
+    ReservationId:
+      name: reservation_id
+      in: path
+      required: true
+      schema: { type: string }
+    CardId:
+      name: card_id
+      in: path
+      required: true
+      schema: { type: string }
+    RefundId:
+      name: refund_id
+      in: path
+      required: true
+      schema: { type: string }
+  responses:
+    Ok:
+      description: 操作成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Envelope'
+    PagedOk:
+      description: 分页结果
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PagedEnvelope'
+  schemas:
+    Envelope:
+      type: object
+      required: [request_id, data]
+      properties:
+        request_id: { type: string }
+        data:
+          type: object
+    PagedEnvelope:
+      type: object
+      required: [request_id, data, page]
+      properties:
+        request_id: { type: string }
+        data:
+          type: array
+          items: { type: object }
+        page:
+          type: object
+          properties:
+            page_no: { type: integer }
+            page_size: { type: integer }
+            total: { type: integer }
+    WechatLoginRequest:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string }
+    AuthTokenResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: object
+              required: [access_token, refresh_token, expires_in]
+              properties:
+                access_token: { type: string }
+                refresh_token: { type: string }
+                expires_in: { type: integer }
+                user_profile_completed: { type: boolean }
+    StaffPinLoginRequest:
+      type: object
+      required: [staff_pin]
+      properties:
+        staff_pin: { type: string }
+    StaffSessionRequest:
+      type: object
+      properties:
+        staff_pin: { type: string }
+        staff_token: { type: string }
+      oneOf:
+        - required: [staff_pin]
+        - required: [staff_token]
+    StaffPinLoginResponse:
+      type: object
+      properties:
+        staff:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            role:
+              type: string
+              enum: [STAFF, OWNER]
+            permissions:
+              type: array
+              items:
+                type: string
+                enum: ['reservation:review', 'reservation:checkin', 'member:redeem', 'refund:review', 'member:read', 'order:read', 'finance:read']
+        staff_pin: { type: string }
+        staff_token: { type: string }
+        access_token: { type: string }
+        token_type: { type: string }
+        expires_in: { type: integer }
+        warning: { type: string }
+    Pet:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        breed: { type: string }
+        size: { type: string, enum: [small, medium, large] }
+        risk_review_required: { type: boolean }
+        vaccine_status: { type: string }
+    PetInput:
+      type: object
+      required: [name, breed, size]
+      properties:
+        name: { type: string }
+        breed: { type: string }
+        size: { type: string, enum: [small, medium, large] }
+        birthday: { type: string, format: date }
+        vaccine_files:
+          type: array
+          items: { type: string }
+        health_notes: { type: string }
+        conflict_history: { type: string }
+    RequiredAgreementsResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                required:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      agreement_id: { type: string }
+                      title: { type: string }
+                      version: { type: string }
+                      must_accept_before_reservation: { type: boolean }
+    ReservationSlotsResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  slot_id: { type: string }
+                  starts_at: { type: string, format: date-time }
+                  ends_at: { type: string, format: date-time }
+                  remaining_people: { type: integer }
+                  remaining_dogs: { type: integer }
+                  requires_manual_review: { type: boolean }
+    Reservation:
+      type: object
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        slotId: { type: string }
+        peopleCount: { type: integer }
+        petIds:
+          type: array
+          items: { type: string }
+        entryType: { type: string }
+        status:
+          type: string
+          enum: [PENDING_REVIEW, CONFIRMED, CANCELED, RESCHEDULE_REQUESTED, REJECTED, CHECKED_IN]
+        estimatedAmountFen: { type: integer }
+        reviewReason: { type: string }
+        adminReviewNote: { type: string }
+        reviewedAt: { type: string, format: date-time }
+        checkinCodeExpiresAt: { type: string, format: date-time }
+        cancelReason: { type: string }
+        rescheduleRequested: { type: boolean }
+        canceledAt: { type: string, format: date-time }
+        checkedInAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+    CreateReservationRequest:
+      type: object
+      required: [slot_id, people_count, pet_ids, entry_type]
+      properties:
+        slot_id: { type: string }
+        people_count: { type: integer, minimum: 1 }
+        pet_ids:
+          type: array
+          items: { type: string }
+        entry_type:
+          type: string
+          enum: [single_ticket, ten_pass_card, season_card, annual_card]
+        card_id: { type: string }
+        extra_dog_payment_choice:
+          type: string
+          enum: [deduct_card_unit, pay_extra_fee]
+    CreateReservationResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                reservation_id: { type: string }
+                status: { type: string }
+                payment_required: { type: boolean }
+                payment_order_id: { type: string }
+                review_required: { type: boolean }
+                benefit_locked: { type: boolean }
+    CardsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/MemberCard'
+    MemberCard:
+      type: object
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        cardType: { type: string, enum: [TEN_PASS, SEASON, ANNUAL] }
+        title: { type: string }
+        status: { type: string, enum: [ACTIVE, EXPIRED, FROZEN] }
+        totalUnits: { type: integer }
+        remainingUnits: { type: integer }
+        validFrom: { type: string, format: date-time }
+        validUntil: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+    RedemptionCodeResponse:
+      type: object
+      properties:
+        card_id: { type: string }
+        code: { type: string, example: '123456' }
+        expires_in_seconds: { type: integer, example: 60 }
+        expires_at: { type: string, format: date-time }
+    ProductsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          product_id: { type: string }
+          sku_id: { type: string }
+          scene: { type: string, enum: [ticket, card, bar, retail] }
+          name: { type: string }
+          price_cents: { type: integer, format: int64 }
+          stock_available: { type: integer }
+          card_type: { type: string, enum: [TEN_PASS, SEASON, ANNUAL] }
+          total_units: { type: integer }
+          valid_days: { type: integer }
+    Order:
+      type: object
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        scene: { type: string, enum: [TICKET, CARD, BAR, RETAIL] }
+        payableAmountCents: { type: integer, format: int64 }
+        status: { type: string, enum: [PAID, CANCELED, REFUND_REQUESTED] }
+        relatedCardId: { type: string }
+        paidAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+    Payment:
+      type: object
+      properties:
+        id: { type: string }
+        orderId: { type: string }
+        userId: { type: string }
+        amountCents: { type: integer, format: int64 }
+        channel: { type: string, enum: [LOCAL_MOCK, WECHAT_PAY] }
+        status: { type: string, enum: [SUCCESS, FAILED] }
+        paidAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+    PaymentStatusResponse:
+      type: object
+      properties:
+        order_id: { type: string }
+        payment_id: { type: string }
+        payment_status: { type: string, enum: [PENDING, SUCCESS, FAILED] }
+        order_status: { type: string, enum: [PAID, CANCELED, REFUND_REQUESTED] }
+        amount_cents: { type: integer, format: int64 }
+        channel: { type: string, enum: [LOCAL_MOCK, WECHAT_PAY] }
+        paid_at: { type: string, format: date-time }
+        created_at: { type: string, format: date-time }
+        warning: { type: string }
+    CreateOrderRequest:
+      type: object
+      required: [user_id, scene, items]
+      properties:
+        user_id: { type: string }
+        scene:
+          type: string
+          enum: [ticket, card, bar, retail]
+        reservation_id: { type: string }
+        items:
+          type: array
+          items:
+            type: object
+            required: [sku_id, quantity]
+            properties:
+              sku_id: { type: string }
+              quantity: { type: integer, minimum: 1 }
+    CreateOrderResponse:
+      type: object
+      properties:
+        order_id: { type: string }
+        status: { type: string, enum: [PAID, CANCELED, REFUND_REQUESTED] }
+        payable_amount_cents: { type: integer, format: int64 }
+        payment_params: { type: object }
+        related_card_id: { type: string }
+        order:
+          $ref: '#/components/schemas/Order'
+        payment:
+          $ref: '#/components/schemas/Payment'
+    CreateRefundRequest:
+      type: object
+      required: [user_id, source_type, source_id, reason]
+      properties:
+        user_id: { type: string }
+        source_type:
+          type: string
+          enum: [order]
+        source_id: { type: string }
+        reason: { type: string }
+        evidence_file_ids:
+          type: array
+          items: { type: string }
+    Refund:
+      type: object
+      properties:
+        refund_id: { type: string }
+        user_id: { type: string }
+        source_type: { type: string, enum: [ORDER] }
+        source_id: { type: string }
+        status: { type: string, enum: [PENDING_REVIEW, APPROVED, REJECTED, CANCELED] }
+        reason: { type: string }
+        calculated_refund_cents: { type: integer, format: int64 }
+        components:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              amount_cents: { type: integer, format: int64 }
+        evidence_file_ids:
+          type: array
+          items: { type: string }
+        created_at: { type: string, format: date-time }
+        reviewed_at: { type: string, format: date-time }
+        review_note: { type: string }
+    CreateRefundResponse:
+      $ref: '#/components/schemas/Refund'
+    RefundStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/Refund'
+        - type: object
+          properties:
+            source_order_status:
+              type: string
+              enum: [PAID, CANCELED, REFUND_REQUESTED, '']
+    ReviewRefundRequest:
+      type: object
+      required: [action]
+      properties:
+        staff_pin: { type: string }
+        staff_token: { type: string }
+        action:
+          type: string
+          enum: [APPROVE, REJECT]
+        note: { type: string }
+    AdminWorkbenchResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                pending_reviews: { type: integer }
+                confirmed_reservations: { type: integer }
+                checked_in: { type: integer }
+                weak_network_pending: { type: integer }
+                no_show_candidates: { type: integer }
+    CheckInRequest:
+      type: object
+      required: [reservation_id, safety_check]
+      properties:
+        reservation_id: { type: string }
+        safety_check:
+          type: object
+          required: [six_questions_confirmed, agreement_confirmed, staff_assessment]
+          properties:
+            six_questions_confirmed: { type: boolean }
+            agreement_confirmed: { type: boolean }
+            staff_assessment: { type: string }
+            floatation_vest_required: { type: boolean }
+    ConsumeCodeRequest:
+      type: object
+      required: [code]
+      properties:
+        staff_pin: { type: string }
+        staff_token: { type: string }
+        code: { type: string, example: '123456' }
+        note: { type: string }
+    ConsumeCodeResponse:
+      type: object
+      properties:
+        card:
+          $ref: '#/components/schemas/MemberCard'
+        redemption:
+          type: object
+          properties:
+            id: { type: string }
+            cardId: { type: string }
+            userId: { type: string }
+            consumedAt: { type: string, format: date-time }
+            consumedBy: { type: string }
+            note: { type: string }
+    OfflineAdmissionRequest:
+      type: object
+      required: [user_id, observed_at, reason, manager_note]
+      properties:
+        user_id: { type: string }
+        card_id: { type: string }
+        observed_at: { type: string, format: date-time }
+        reason: { type: string }
+        manager_note: { type: string }
+    ApprovalRequest:
+      type: object
+      required: [approved, note]
+      properties:
+        approved: { type: boolean }
+        note: { type: string }
+    InventoryMovementRequest:
+      type: object
+      required: [sku_id, movement_type, quantity, source_type]
+      properties:
+        sku_id: { type: string }
+        movement_type:
+          type: string
+          enum: [purchase_in, sale_out, gift_out, loss_out, adjustment_in, adjustment_out, refund_in]
+        quantity: { type: number }
+        unit_cost_cents: { type: integer, format: int64 }
+        source_type: { type: string }
+        source_id: { type: string }
+        note: { type: string }
+    CreateExpenseRequest:
+      type: object
+      required: [category, amount_cents, occurred_at, description]
+      properties:
+        category: { type: string }
+        amount_cents: { type: integer, format: int64 }
+        occurred_at: { type: string, format: date }
+        description: { type: string }
+        supplier_id: { type: string }
+        invoice_file_ids:
+          type: array
+          items: { type: string }
+    CapacityRuleInput:
+      type: object
+      required: [name, effective_from, max_people, max_dogs]
+      properties:
+        name: { type: string }
+        effective_from: { type: string, format: date-time }
+        effective_to: { type: string, format: date-time }
+        weekday: { type: integer, minimum: 1, maximum: 7 }
+        time_range:
+          type: object
+          properties:
+            start: { type: string }
+            end: { type: string }
+        max_people: { type: integer }
+        max_dogs: { type: integer }
+        max_large_dogs: { type: integer }
+        max_swimming_dogs: { type: integer }
+    ReportOverviewResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                cash_total_cents: { type: integer, format: int64 }
+                available_cash_cents: { type: integer, format: int64 }
+                actual_receipts_cents: { type: integer, format: int64 }
+                internal_revenue_cents: { type: integer, format: int64 }
+                deferred_entitlement_cents: { type: integer, format: int64 }
+                refunds_cents: { type: integer, format: int64 }
+                operating_expenses_cents: { type: integer, format: int64 }
+    FinanceOverviewResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                cash:
+                  type: object
+                  properties:
+                    cash_total_cents: { type: integer, format: int64 }
+                    available_cash_cents: { type: integer, format: int64 }
+                    restricted_cash_cents: { type: integer, format: int64 }
+                    cash_coverage_months: { type: number, nullable: true }
+                profit:
+                  $ref: '#/components/schemas/FinanceProfitData'
+                orders:
+                  $ref: '#/components/schemas/FinanceOrderSummary'
+                refunds:
+                  $ref: '#/components/schemas/FinanceRefundSummary'
+                member_cards:
+                  $ref: '#/components/schemas/FinanceMemberCardSummary'
+                dividend_basis:
+                  $ref: '#/components/schemas/DividendBasisData'
+                formula_version: { type: string }
+                warning: { type: string }
+    FinanceProfitResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/FinanceProfitData'
+            formula_version: { type: string }
+            formula_note: { type: string }
+    DividendBasisResponse:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/DividendBasisData'
+            formula_version: { type: string }
+            formula_note: { type: string }
+    FinanceProfitData:
+      type: object
+      properties:
+        internal_revenue_cents: { type: integer, format: int64 }
+        product_cost_cents: { type: integer, format: int64 }
+        direct_variable_cost_cents: { type: integer, format: int64 }
+        member_fulfillment_cost_cents: { type: integer, format: int64 }
+        marketing_cost_cents: { type: integer, format: int64 }
+        operating_expenses_cents: { type: integer, format: int64 }
+        internal_gross_profit_cents: { type: integer, format: int64 }
+        internal_operating_profit_cents: { type: integer, format: int64 }
+    FinanceOrderSummary:
+      type: object
+      properties:
+        total_orders: { type: integer }
+        paid_orders: { type: integer }
+        card_orders: { type: integer }
+        paid_amount_cents: { type: integer, format: int64 }
+        card_sales_cents: { type: integer, format: int64 }
+    FinanceRefundSummary:
+      type: object
+      properties:
+        total_refunds: { type: integer }
+        pending_refunds: { type: integer }
+        approved_refunds: { type: integer }
+        pending_amount_cents: { type: integer, format: int64 }
+        approved_amount_cents: { type: integer, format: int64 }
+    FinanceMemberCardSummary:
+      type: object
+      properties:
+        total_cards: { type: integer }
+        active_cards: { type: integer }
+        ten_pass_cards: { type: integer }
+        season_cards: { type: integer }
+        annual_cards: { type: integer }
+        remaining_ten_pass_units: { type: integer }
+    DividendBasisData:
+      type: object
+      properties:
+        internal_operating_profit_cents: { type: integer, format: int64 }
+        available_cash_cents: { type: integer, format: int64 }
+        future_fixed_expense_reserve_cents: { type: integer, format: int64 }
+        deferred_entitlement_risk_reserve_cents: { type: integer, format: int64 }
+        pending_refund_and_dispute_reserve_cents: { type: integer, format: int64 }
+        tax_and_accounting_reserve_cents: { type: integer, format: int64 }
+        safety_cash_before_dividend_cents: { type: integer, format: int64 }
+        suggested_dividend_ceiling_cents: { type: integer, format: int64 }
+        dividend_recommendation:
+          type: string
+          enum: [REVIEW_REQUIRED, NOT_RECOMMENDED]

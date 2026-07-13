@@ -1,0 +1,153 @@
+.check-result {
+  margin-top: 24rpx;
+  padding: 36rpx 28rpx;
+  border-radius: 32rpx;
+  color: #ffffff;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.staff-input {
+  width: 100%;
+  height: 76rpx;
+  margin: 22rpx 0;
+  padding: 0 22rpx;
+  border: 1rpx solid rgba(31, 39, 35, 0.14);
+  border-radius: 8rpx;
+  background: #ffffff;
+  box-sizing: border-box;
+  color: #1f2723;
+  font-size: 28rpx;
+}
+
+.code-input {
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.staff-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.refresh-button {
+  width: 120rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  border-radius: 8rpx;
+  background: #edf6f2;
+  color: #3f6f4e;
+  font-size: 24rpx;
+}
+
+.staff-reservation {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid rgba(31, 39, 35, 0.08);
+}
+
+.staff-reservation:last-child {
+  border-bottom: 0;
+}
+
+.staff-refund {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid rgba(31, 39, 35, 0.08);
+}
+
+.staff-refund:last-child {
+  border-bottom: 0;
+}
+
+.staff-record {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid rgba(31, 39, 35, 0.08);
+}
+
+.staff-record:last-child {
+  border-bottom: 0;
+}
+
+.staff-subtitle {
+  display: block;
+  margin-top: 22rpx;
+  color: #1f2723;
+  font-size: 26rpx;
+  font-weight: 800;
+  line-height: 36rpx;
+}
+
+.staff-reservation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.staff-slot {
+  color: #1f2723;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.staff-status {
+  color: #3f6f4e;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.staff-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 10rpx;
+}
+
+.staff-button {
+  flex: 1;
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 8rpx;
+  background: #edf6f2;
+  color: #3f6f4e;
+  font-size: 24rpx;
+}
+
+.staff-button.danger {
+  background: #fff0ec;
+  color: #b2533e;
+}
+
+.check-result-ok {
+  background: #3f6f4e;
+}
+
+.check-result-warn {
+  background: #c9a24a;
+}
+
+.check-result-title {
+  display: block;
+  font-size: 42rpx;
+  font-weight: 800;
+  line-height: 54rpx;
+}
+
+.check-result-desc {
+  display: block;
+  margin-top: 10rpx;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 24rpx;
+  line-height: 36rpx;
+}

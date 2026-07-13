@@ -1,0 +1,69 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">会员中心</text>
+    <text class="bb-hero-subtitle">会员权益、动态码和核销规则</text>
+  </view>
+
+  <view class="member-buy-section" wx:if="{{products.length}}">
+    <text class="bb-section-title">购买会员卡</text>
+    <view class="member-product" wx:for="{{products}}" wx:key="skuId">
+      <view class="member-product-main">
+        <text class="member-product-title">{{item.title}}</text>
+        <text class="member-product-desc">{{item.desc}}</text>
+      </view>
+      <view class="member-product-action">
+        <text class="member-product-price">¥{{item.price}}</text>
+        <button class="member-buy-button" data-sku="{{item.skuId}}" bindtap="buyProduct">购买</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="member-card" wx:for="{{cards}}" wx:key="type">
+    <text class="member-title">{{item.type}}</text>
+    <text class="bb-price">¥{{item.price}}</text>
+    <text class="member-desc">{{item.desc}}</text>
+    <text class="bb-chip bb-chip-gold">{{item.status}}</text>
+    <button class="member-code-button" wx:if="{{item.canGenerateCode}}" data-id="{{item.id}}" bindtap="generateCode">生成核销码</button>
+  </view>
+
+  <view class="member-code-card" wx:if="{{redemptionCode}}">
+    <text class="member-code-title">{{redemptionCode.title}}</text>
+    <text class="member-code">{{redemptionCode.code}}</text>
+    <text class="member-code-desc">60 秒内有效｜到期时间 {{redemptionCode.expiresAt}}</text>
+  </view>
+
+  <view class="member-order-section" wx:if="{{orders.length}}">
+    <text class="bb-section-title">购买记录</text>
+    <view class="member-order" wx:for="{{orders}}" wx:key="id">
+      <view class="member-order-main">
+        <text class="member-order-title">{{item.title}}</text>
+        <text class="member-order-time">{{item.paidAt}}</text>
+      </view>
+      <view class="member-order-side">
+        <text class="member-order-amount">¥{{item.amount}}</text>
+        <text class="member-order-status">{{item.status}}</text>
+        <text class="member-order-refund" wx:if="{{item.refundStatus}}">{{item.refundStatus}}</text>
+        <button
+          class="member-refund-refresh-button"
+          wx:if="{{item.refundId}}"
+          data-refund="{{item.refundId}}"
+          loading="{{refundStatusCheckingId === item.refundId}}"
+          disabled="{{refundStatusCheckingId === item.refundId}}"
+          bindtap="refreshRefundStatus"
+        >刷新状态</button>
+        <button
+          class="member-refund-button"
+          wx:if="{{item.canRefund}}"
+          data-id="{{item.id}}"
+          loading="{{refundingOrderId === item.id}}"
+          disabled="{{refundingOrderId === item.id}}"
+          bindtap="requestRefund"
+        >申请退款</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="bb-warning">
+    动态码 60 秒有效、一次性使用，截图、录屏、转发无效。到店仍需完成现场安全核验。
+  </view>
+</view>

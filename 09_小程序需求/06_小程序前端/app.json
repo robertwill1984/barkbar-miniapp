@@ -1,0 +1,47 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/reservation/index",
+    "pages/reservation-success/index",
+    "pages/activities/index",
+    "pages/profile/index",
+    "pages/pet-profile/index",
+    "pages/agreement/index",
+    "pages/agreement-detail/index",
+    "pages/member/index",
+    "pages/staff-checkin/index",
+    "pages/owner-finance/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Bark & Bar",
+    "navigationBarBackgroundColor": "#3f6f4e",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f3ea"
+  },
+  "tabBar": {
+    "color": "#8a8e86",
+    "selectedColor": "#3f6f4e",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/reservation/index",
+        "text": "预约"
+      },
+      {
+        "pagePath": "pages/activities/index",
+        "text": "活动"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

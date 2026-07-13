@@ -1,0 +1,56 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">我的</text>
+    <text class="bb-hero-subtitle">{{userName}}｜资料、会员和预约</text>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">会员中心</text>
+    <text class="bb-body">查看会员卡、动态码、权益和核销记录。</text>
+    <button class="bb-button-primary" bindtap="goMember">进入会员中心</button>
+  </view>
+
+  <view class="bb-card">
+    <view class="bb-list-item" wx:for="{{quickLinks}}" wx:key="title">
+      <text class="bb-section-title">{{item.title}}</text>
+      <text class="bb-muted">{{item.desc}}</text>
+    </view>
+    <button class="bb-button-secondary" bindtap="goPetProfile">维护宠物档案</button>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">我的预约</text>
+    <text class="bb-muted" wx:if="{{!reservations.length}}">暂无预约记录</text>
+    <view class="reservation-item" wx:for="{{reservations}}" wx:key="id">
+      <view class="reservation-head">
+        <text class="reservation-time">{{item.slotLabel}}</text>
+        <text class="reservation-status">{{item.status}}</text>
+      </view>
+      <text class="bb-body">人数/犬只：{{item.peopleCount}} 人｜{{item.dogCount}} 狗</text>
+      <text class="bb-body">犬只：{{item.petName}}</text>
+      <text class="bb-muted" wx:if="{{item.cancelReason}}">原因：{{item.cancelReason}}</text>
+      <view class="reservation-actions" wx:if="{{item.status === '待到店' || item.status === '需人工审核'}}">
+        <button class="mini-button" wx:if="{{item.status === '待到店'}}" data-id="{{item.id}}" bindtap="generateCheckinCode">生成核验码</button>
+        <button class="mini-button" data-id="{{item.id}}" bindtap="requestReschedule">申请改期</button>
+        <button class="mini-button danger" data-id="{{item.id}}" bindtap="cancelReservation">取消预约</button>
+      </view>
+    </view>
+    <view class="checkin-code-card" wx:if="{{checkinCode}}">
+      <text class="bb-muted">60 秒内向员工出示</text>
+      <text class="checkin-code">{{checkinCode.code}}</text>
+      <text class="bb-muted">过期时间：{{checkinCode.expires_at}}</text>
+    </view>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">员工入口</text>
+    <text class="bb-body">{{isStaff ? '用于预约核验、现场安全确认和动态码核销。' : '员工输入 PIN 后可进入核验工作台。'}}</text>
+    <button class="bb-button-secondary" bindtap="goStaffCheckin">入园核验</button>
+  </view>
+
+  <view class="bb-card" wx:if="{{isOwner}}">
+    <text class="bb-section-title">经营数据</text>
+    <text class="bb-body">查看本地订单收入、退款待处理、会员卡销售和分红测算依据。</text>
+    <button class="bb-button-secondary" bindtap="goOwnerFinance">查看经营数据</button>
+  </view>
+</view>

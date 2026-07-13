@@ -1,0 +1,33 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">入园须知</text>
+    <text class="bb-hero-subtitle">请先了解核心风险，再继续预约</text>
+  </view>
+
+  <view class="risk-card">
+    <text class="risk-kicker">预约前重点告知</text>
+    <text class="risk-title">这里不是普通宠物公园</text>
+    <text class="risk-desc">Bark & Bar 有泳池、草坪、犬只互动和现场核验。预约成功不等于一定可入水，员工会根据犬只状态做安全判断。</text>
+  </view>
+
+  <view class="risk-grid">
+    <view class="risk-mini-card" wx:for="{{riskHighlights}}" wx:key="title">
+      <text class="risk-mini-title">{{item.title}}</text>
+      <text class="risk-mini-desc">{{item.desc}}</text>
+    </view>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">完整风险与规则</text>
+    <view class="bb-list-item" wx:for="{{rules}}" wx:key="*this">
+      <text class="bb-body">{{index + 1}}. {{item}}</text>
+    </view>
+    <button class="bb-button-secondary" bindtap="openAgreementDetail">查看完整《入园须知及安全协议》</button>
+  </view>
+
+  <view class="bb-card bb-card-soft" bindtap="toggleChecked">
+    <text class="bb-body">{{checked ? '✅' : '⬜️'}} 我已阅读并同意《入园须知及安全协议》{{agreement.version}}，理解泳池、犬只互动和现场拒绝入园等风险</text>
+  </view>
+
+  <button class="bb-button-primary" bindtap="confirmAgreement">确认并继续</button>
+</view>

@@ -1,0 +1,40 @@
+.success-card {
+  margin-top: 24rpx;
+  padding: 40rpx 30rpx;
+  border-radius: 32rpx;
+  background: #3f6f4e;
+  color: #ffffff;
+  text-align: center;
+  box-shadow: 0 16rpx 42rpx rgba(63, 111, 78, 0.2);
+  box-sizing: border-box;
+}
+
+.success-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96rpx;
+  height: 96rpx;
+  margin: 0 auto 18rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.78);
+  border-radius: 999rpx;
+  font-size: 56rpx;
+  font-weight: 900;
+  line-height: normal;
+}
+
+.success-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 52rpx;
+}
+
+.success-desc {
+  display: block;
+  max-width: 500rpx;
+  margin: 10rpx auto 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 24rpx;
+  line-height: 36rpx;
+}

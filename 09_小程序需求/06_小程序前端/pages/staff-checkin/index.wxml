@@ -1,0 +1,125 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">入园核验</text>
+    <text class="bb-hero-subtitle">员工一屏判断：放行 / 观察 / 拒绝</text>
+  </view>
+
+  <view class="bb-card" wx:if="{{!staffUnlocked}}">
+    <text class="bb-section-title">员工 PIN</text>
+    <text class="bb-muted">本地开发默认 PIN 为 8888，正式上线后改为微信员工身份。</text>
+    <input class="staff-input" password value="{{staffPinInput}}" placeholder="请输入员工 PIN" bindinput="onStaffPinInput" />
+    <button class="bb-button-primary" bindtap="unlockStaff">进入员工核验</button>
+  </view>
+
+  <view class="bb-card" wx:if="{{staffUnlocked}}">
+    <text class="bb-section-title">核验项目</text>
+    <text class="bb-muted" wx:if="{{staffName}}">当前身份：{{staffName}}｜{{staffRole}}</text>
+    <view class="bb-list-item" wx:for="{{checks}}" wx:key="title">
+      <text class="bb-body">{{item.title}}</text>
+      <text class="bb-muted">{{item.value}}</text>
+    </view>
+  </view>
+
+  <view class="bb-card" wx:if="{{staffUnlocked}}">
+    <text class="bb-section-title">动态核验码</text>
+    <text class="bb-muted">输入用户 60 秒内生成的 6 位核验码。</text>
+    <input class="staff-input code-input" type="number" maxlength="6" value="{{verificationCode}}" placeholder="请输入核验码" bindinput="onVerificationCodeInput" />
+    <button class="bb-button-primary" bindtap="verifyCode">核验动态码</button>
+  </view>
+
+  <view class="bb-card" wx:if="{{staffUnlocked}}">
+    <text class="bb-section-title">会员核销码</text>
+    <text class="bb-muted">输入会员中心生成的 6 位核销码，核销后 10 次卡自动扣减 1 次。</text>
+    <input class="staff-input code-input" type="number" maxlength="6" value="{{memberCode}}" placeholder="请输入会员码" bindinput="onMemberCodeInput" />
+    <button class="bb-button-primary" bindtap="consumeMemberCode">核销会员码</button>
+  </view>
+
+  <view class="bb-card" wx:if="{{staffUnlocked}}">
+    <view class="staff-card-head">
+      <text class="bb-section-title">会员/订单查询</text>
+      <button class="refresh-button" bindtap="loadMemberRecords">查询</button>
+    </view>
+    <text class="bb-muted">可输入用户 ID 精确查询；为空时显示本地最近会员订单和会员卡。</text>
+    <input class="staff-input" value="{{memberQueryUserId}}" placeholder="用户 ID，可不填" bindinput="onMemberQueryUserIdInput" />
+    <text class="staff-subtitle">会员卡</text>
+    <text class="bb-muted" wx:if="{{!staffCards.length}}">暂无会员卡记录</text>
+    <view class="staff-record" wx:for="{{staffCards}}" wx:key="id">
+      <view class="staff-reservation-head">
+        <text class="staff-slot">{{item.title}}</text>
+        <text class="staff-status">{{item.status}}</text>
+      </view>
+      <text class="bb-body">{{item.balance}}</text>
+      <text class="bb-muted">用户：{{item.userId}}</text>
+      <text class="bb-muted" wx:if="{{item.validUntil}}">有效至：{{item.validUntil}}</text>
+    </view>
+    <text class="staff-subtitle">会员订单</text>
+    <text class="bb-muted" wx:if="{{!staffOrders.length}}">暂无会员订单</text>
+    <view class="staff-record" wx:for="{{staffOrders}}" wx:key="id">
+      <view class="staff-reservation-head">
+        <text class="staff-slot">{{item.title}}</text>
+        <text class="staff-status">{{item.status}}</text>
+      </view>
+      <text class="bb-body">金额：¥{{item.amount}}</text>
+      <text class="bb-muted">用户：{{item.userId}}</text>
+      <text class="bb-muted" wx:if="{{item.paidAt}}">支付：{{item.paidAt}}</text>
+    </view>
+  </view>
+
+  <view class="bb-card" wx:if="{{staffUnlocked}}">
+    <view class="staff-card-head">
+      <text class="bb-section-title">今日预约处理</text>
+      <button class="refresh-button" bindtap="loadStaffData">刷新</button>
+    </view>
+    <text class="bb-muted" wx:if="{{loading}}">正在读取本地后端预约...</text>
+    <text class="bb-muted" wx:elif="{{!reservations.length}}">暂无预约记录</text>
+    <view class="staff-reservation" wx:for="{{reservations}}" wx:key="id">
+      <view class="staff-reservation-head">
+        <text class="staff-slot">{{item.slotLabel}}</text>
+        <text class="staff-status">{{item.status}}</text>
+      </view>
+      <text class="bb-body">人数/犬只：{{item.peopleCount}} 人｜{{item.dogCount}} 狗</text>
+      <text class="bb-muted" wx:if="{{item.reviewReason}}">{{item.reviewReason}}</text>
+      <view class="staff-actions" wx:if="{{item.canReview}}">
+        <button class="staff-button" data-id="{{item.id}}" bindtap="approveReservation">通过</button>
+        <button class="staff-button danger" data-id="{{item.id}}" bindtap="rejectReservation">拒绝</button>
+      </view>
+      <view class="staff-actions" wx:elif="{{item.canCheckin}}">
+        <button class="staff-button" data-id="{{item.id}}" bindtap="checkinReservation">确认到店核验</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="bb-card" wx:if="{{staffUnlocked}}">
+    <view class="staff-card-head">
+      <text class="bb-section-title">退款申请处理</text>
+      <button class="refresh-button" bindtap="loadRefunds">刷新</button>
+    </view>
+    <text class="bb-muted" wx:if="{{!refunds.length}}">暂无退款申请</text>
+    <view class="staff-refund" wx:for="{{refunds}}" wx:key="id">
+      <view class="staff-reservation-head">
+        <text class="staff-slot">¥{{item.amount}}</text>
+        <text class="staff-status">{{item.status}}</text>
+      </view>
+      <text class="bb-body">订单：{{item.sourceId}}</text>
+      <text class="bb-muted">原因：{{item.reason}}</text>
+      <text class="bb-muted" wx:if="{{item.createdAt}}">提交：{{item.createdAt}}</text>
+      <text class="bb-muted" wx:if="{{item.reviewNote}}">备注：{{item.reviewNote}}</text>
+      <view class="staff-actions" wx:if="{{item.canReview}}">
+        <button class="staff-button" data-id="{{item.id}}" bindtap="approveRefund">通过</button>
+        <button class="staff-button danger" data-id="{{item.id}}" bindtap="rejectRefund">拒绝</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="check-result check-result-ok" wx:if="{{staffUnlocked}}">
+    <text class="check-result-title">可入园</text>
+    <text class="check-result-desc">资料无异常、协议已确认、现场观察通过后使用。</text>
+  </view>
+
+  <view class="check-result check-result-warn" wx:if="{{staffUnlocked}}">
+    <text class="check-result-title">需观察</text>
+    <text class="check-result-desc">首次入园、首次游泳或员工无法判断时，先请主理人处理。</text>
+  </view>
+
+  <button class="bb-button-primary" wx:if="{{staffUnlocked}}" bindtap="loadStaffData">刷新员工数据</button>
+</view>

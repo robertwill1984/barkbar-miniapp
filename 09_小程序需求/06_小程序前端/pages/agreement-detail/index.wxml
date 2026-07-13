@@ -1,0 +1,24 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">安全协议</text>
+    <text class="bb-hero-subtitle">{{agreement.title}} {{agreement.version}}</text>
+  </view>
+
+  <view class="agreement-meta">
+    <text class="agreement-meta-text">版本：{{agreement.version}}</text>
+    <text class="agreement-meta-text">生效日期：{{agreement.effectiveDate}}</text>
+    <text class="agreement-meta-source">来源：{{agreement.sourceTitle}}</text>
+    <text class="agreement-meta-source">源版本：{{agreement.sourceVersion}}</text>
+    <text class="agreement-meta-desc">请完整阅读。点击同意后，系统会记录协议版本、确认时间和内容快照。</text>
+    <text class="agreement-meta-desc">{{agreement.sourceNote}}</text>
+  </view>
+
+  <view class="agreement-section" wx:for="{{agreement.sections}}" wx:key="title">
+    <text class="agreement-section-title">{{item.title}}</text>
+    <view class="agreement-paragraph" wx:for="{{item.paragraphs}}" wx:for-item="paragraph" wx:key="*this">
+      <text class="agreement-paragraph-text">{{paragraph}}</text>
+    </view>
+  </view>
+
+  <button class="bb-button-primary" bindtap="goBack">我已阅读，返回确认</button>
+</view>

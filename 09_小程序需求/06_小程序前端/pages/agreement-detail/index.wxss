@@ -1,0 +1,61 @@
+.agreement-meta {
+  margin-top: 24rpx;
+  padding: 26rpx;
+  border: 2rpx solid #d8d2c4;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.agreement-meta-text {
+  display: block;
+  color: #20231f;
+  font-size: 26rpx;
+  font-weight: 750;
+  line-height: 38rpx;
+}
+
+.agreement-meta-source {
+  display: block;
+  margin-top: 8rpx;
+  color: #4a4f46;
+  font-size: 24rpx;
+  line-height: 36rpx;
+}
+
+.agreement-meta-desc {
+  display: block;
+  margin-top: 12rpx;
+  color: #8a8e86;
+  font-size: 24rpx;
+  line-height: 38rpx;
+}
+
+.agreement-section {
+  margin-top: 24rpx;
+  padding: 30rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  border: 2rpx solid #d8d2c4;
+  box-shadow: 0 10rpx 28rpx rgba(32, 35, 31, 0.055);
+  box-sizing: border-box;
+}
+
+.agreement-section-title {
+  display: block;
+  color: #20231f;
+  font-size: 32rpx;
+  font-weight: 800;
+  line-height: 46rpx;
+}
+
+.agreement-paragraph {
+  margin-top: 18rpx;
+}
+
+.agreement-paragraph-text {
+  display: block;
+  color: #4a4f46;
+  font-size: 26rpx;
+  line-height: 44rpx;
+}

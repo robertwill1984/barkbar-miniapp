@@ -1,0 +1,34 @@
+<view class="bb-page" wx:if="{{reservation}}">
+  <view class="bb-hero">
+    <text class="bb-hero-title">预约已提交</text>
+    <text class="bb-hero-subtitle">{{reservation.status}}</text>
+  </view>
+
+  <view class="success-card">
+    <text class="success-mark">✓</text>
+    <text class="success-title">{{reservation.status}}</text>
+    <text class="success-desc">请到店出示预约信息，并配合员工完成现场安全核验。</text>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">预约信息</text>
+    <view class="bb-list-item">
+      <text class="bb-body">时段：{{reservation.slotLabel}}</text>
+    </view>
+    <view class="bb-list-item">
+      <text class="bb-body">人数/犬只：{{reservation.peopleCount}} 人｜{{reservation.dogCount}} 狗</text>
+    </view>
+    <view class="bb-list-item">
+      <text class="bb-body">犬只：{{reservation.petName}}</text>
+    </view>
+    <view class="bb-list-item">
+      <text class="bb-body">预估费用：¥{{reservation.totalAmount}}</text>
+    </view>
+  </view>
+
+  <view class="bb-warning">
+    到店后请牵引犬只，并配合员工完成疫苗/健康、协议和泳池安全核验。会员权益不能替代现场安全核验。
+  </view>
+
+  <button class="bb-button-primary" bindtap="backHome">返回首页</button>
+</view>

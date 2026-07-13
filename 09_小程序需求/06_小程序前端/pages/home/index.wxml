@@ -1,0 +1,67 @@
+<view class="bb-page home-page">
+  <view class="home-topbar">
+    <view>
+      <text class="home-brand">Bark & Bar</text>
+      <text class="home-brand-sub">巴克巴 · 番禺宠主会客厅</text>
+    </view>
+    <text class="home-member-chip">会员</text>
+  </view>
+
+  <view class="bb-hero home-hero">
+    <text class="home-hero-slogan">带上毛孩子，回家喝一杯。</text>
+    <text class="bb-hero-subtitle home-hero-subtitle">番禺宠物会客厅｜泳池 · 草坪 · 饮品</text>
+    <text class="home-hero-badge">今日 {{businessHours}}</text>
+  </view>
+
+  <view class="bb-card home-business-card">
+    <view class="home-card-head">
+      <text class="bb-section-title home-section-title">今日正常营业</text>
+      <text class="home-status-chip">营业中</text>
+    </view>
+    <text class="bb-body home-business-time">{{businessHours}} · 最晚入园 {{latestAdmission}}</text>
+    <button class="bb-button-primary home-primary-button" bindtap="goReservation">立即预约</button>
+  </view>
+
+  <text class="home-block-title">来这里做什么</text>
+  <view class="home-feature-grid">
+    <view class="bb-feature-card home-feature-card" wx:for="{{highlights}}" wx:key="title">
+      <view class="home-feature-icon home-feature-icon-{{item.icon}}">
+        <view class="home-icon-line"></view>
+        <view class="home-icon-line"></view>
+      </view>
+      <text class="bb-feature-title home-feature-title">{{item.title}}</text>
+      <text class="bb-feature-subtitle home-feature-subtitle">{{item.subtitle}}</text>
+    </view>
+  </view>
+
+  <view class="bb-card home-price-card">
+    <view class="home-price-head">
+      <view>
+        <text class="home-price-label">单次入园</text>
+        <text class="home-price-desc">含 2 人 1 狗</text>
+      </view>
+      <view class="home-price-row">
+        <text class="home-price-symbol">¥</text>
+        <text class="home-price-main">68</text>
+      </view>
+    </view>
+    <text class="home-price-extra">加人 ¥20｜加狗 ¥50</text>
+  </view>
+
+  <view class="home-activity-card">
+    <view class="home-activity-icon">水</view>
+    <view class="home-activity-copy">
+      <text class="home-activity-title">第一次下水适应课</text>
+      <text class="home-activity-subtitle">小狗和首次游泳狗狗需穿宠物救生衣</text>
+    </view>
+  </view>
+
+  <view class="bb-card home-notice-card">
+    <text class="bb-section-title home-section-title">入园重点</text>
+    <view class="home-notice-item" wx:for="{{notices}}" wx:key="*this">
+      <text class="home-notice-dot"></text>
+      <text class="bb-body home-notice-text">{{item}}</text>
+    </view>
+    <button class="bb-button-secondary home-secondary-button" bindtap="goAgreement">查看完整入园须知</button>
+  </view>
+</view>

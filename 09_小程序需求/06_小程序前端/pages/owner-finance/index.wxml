@@ -1,0 +1,76 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">经营数据</text>
+    <text class="bb-hero-subtitle">本地订单收入｜退款待处理｜会员卡销售｜分红测算依据</text>
+  </view>
+
+  <view class="finance-toolbar">
+    <text class="bb-muted">{{generatedAt}}</text>
+    <button class="finance-refresh" bindtap="loadFinance">刷新</button>
+  </view>
+
+  <view class="finance-grid">
+    <view class="finance-metric">
+      <text class="finance-label">可用现金</text>
+      <text class="finance-value">¥{{cash.available}}</text>
+      <text class="finance-note">本地模拟现金</text>
+    </view>
+    <view class="finance-metric">
+      <text class="finance-label">内部收入</text>
+      <text class="finance-value">¥{{profit.revenue}}</text>
+      <text class="finance-note">模拟支付口径</text>
+    </view>
+    <view class="finance-metric">
+      <text class="finance-label">内部利润</text>
+      <text class="finance-value">¥{{profit.operating}}</text>
+      <text class="finance-note">非法定利润</text>
+    </view>
+    <view class="finance-metric finance-metric-warn">
+      <text class="finance-label">待审退款</text>
+      <text class="finance-value">¥{{refunds.pendingAmount}}</text>
+      <text class="finance-note">{{refunds.pendingCount}} 笔待处理</text>
+    </view>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">订单与会员卡</text>
+    <view class="finance-row">
+      <text class="bb-body">已支付订单</text>
+      <text class="finance-row-value">{{orders.paidCount}} 笔｜¥{{orders.paidAmount}}</text>
+    </view>
+    <view class="finance-row">
+      <text class="bb-body">会员卡订单</text>
+      <text class="finance-row-value">{{orders.cardCount}} 笔｜¥{{orders.cardAmount}}</text>
+    </view>
+    <view class="finance-row">
+      <text class="bb-body">有效会员卡</text>
+      <text class="finance-row-value">{{cards.activeCount}} 张</text>
+    </view>
+    <view class="finance-row">
+      <text class="bb-body">10次卡剩余次数</text>
+      <text class="finance-row-value">{{cards.remainingUnits}} 次</text>
+    </view>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">分红测算依据</text>
+    <view class="finance-row">
+      <text class="bb-body">安全现金口径</text>
+      <text class="finance-row-value">¥{{dividend.safetyCash}}</text>
+    </view>
+    <view class="finance-row">
+      <text class="bb-body">建议上限</text>
+      <text class="finance-row-value">¥{{dividend.ceiling}}</text>
+    </view>
+    <view class="finance-row">
+      <text class="bb-body">系统建议</text>
+      <text class="finance-row-value">{{dividend.recommendation}}</text>
+    </view>
+    <text class="bb-warning">{{dividend.note}}</text>
+  </view>
+
+  <view class="bb-card bb-card-soft">
+    <text class="bb-section-title">口径提醒</text>
+    <text class="bb-body">{{warning}}</text>
+  </view>
+</view>

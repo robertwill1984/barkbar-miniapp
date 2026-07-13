@@ -1,0 +1,60 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">预约入园</text>
+    <text class="bb-hero-subtitle">请至少提前 2 小时预约，最晚 19:30 入园</text>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">选择时段</text>
+    <view
+      class="slot {{selectedSlotId === item.id ? 'slot-active' : ''}}"
+      wx:for="{{slots}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="selectSlot"
+    >
+      <text class="bb-body">{{item.label}}</text>
+      <text class="bb-chip {{item.status === '余量紧张' ? 'bb-chip-gold' : 'bb-chip-green'}}">{{item.status}}</text>
+    </view>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">犬只档案</text>
+    <text class="bb-body">当前犬只：{{petName}}</text>
+    <button class="bb-button-secondary" bindtap="goPetProfile">填写/更新宠物档案</button>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">人数和犬只</text>
+    <view class="counter-row">
+      <text class="bb-body">入园人数</text>
+      <view class="counter">
+        <button class="counter-button" bindtap="decreasePeople">-</button>
+        <text>{{peopleCount}}</text>
+        <button class="counter-button" bindtap="increasePeople">+</button>
+      </view>
+    </view>
+    <view class="counter-row">
+      <text class="bb-body">犬只数量</text>
+      <view class="counter">
+        <button class="counter-button" bindtap="decreaseDog">-</button>
+        <text>{{dogCount}}</text>
+        <button class="counter-button" bindtap="increaseDog">+</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="bb-warning">
+    幼犬、小型犬、首次游泳、不会游泳或游泳能力未确认的犬只，入水前必须穿宠物救生衣。员工可根据现场情况要求其他犬只穿戴。
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">费用预估</text>
+    <text class="bb-body">单次票含 2 人 1 狗，超出按增人/增狗计费。</text>
+    <text class="bb-price">¥{{estimatedAmount}}</text>
+    <text class="bb-muted">协议状态：{{agreementConfirmed ? '已确认' : '待确认'}}</text>
+    <button class="bb-button-secondary" bindtap="continueAgreement">确认入园须知</button>
+  </view>
+
+  <button class="bb-button-primary" bindtap="submitReservation">提交预约</button>
+</view>

@@ -1,0 +1,52 @@
+.slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16rpx;
+  padding: 22rpx;
+  border: 2rpx solid #d8d2c4;
+  border-radius: 18rpx;
+  background: #fbf8f0;
+  box-sizing: border-box;
+}
+
+.slot-active {
+  border-color: #3f6f4e;
+  background: rgba(63, 111, 78, 0.08);
+}
+
+.counter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #ece6da;
+  min-height: 92rpx;
+  box-sizing: border-box;
+}
+
+.counter-row:last-child {
+  border-bottom: 0;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  font-weight: 800;
+}
+
+.counter-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  line-height: normal;
+  padding: 0;
+  border-radius: 999rpx;
+  background: #f7f3ea;
+  color: #20231f;
+  font-size: 30rpx;
+  font-weight: 760;
+}

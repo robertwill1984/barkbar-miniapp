@@ -1,0 +1,20 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">活动</text>
+    <text class="bb-hero-subtitle">犬种日、第一次下水、会员日和社群活动</text>
+  </view>
+
+  <view class="activity-card" wx:for="{{activities}}" wx:key="title">
+    <view class="activity-cover">
+      <text class="activity-title">{{item.title}}</text>
+      <text class="activity-subtitle">巴克巴社群活动</text>
+    </view>
+    <view class="activity-content">
+      <view class="bb-row">
+        <text class="bb-chip bb-chip-blue">{{item.date}}</text>
+        <text class="bb-chip bb-chip-gold">{{item.tag}}</text>
+      </view>
+      <text class="bb-body">{{item.capacity}}</text>
+    </view>
+  </view>
+</view>

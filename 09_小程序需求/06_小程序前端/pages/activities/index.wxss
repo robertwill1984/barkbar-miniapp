@@ -1,0 +1,38 @@
+.activity-card {
+  margin-top: 24rpx;
+  overflow: hidden;
+  background: #ffffff;
+  border: 2rpx solid #d8d2c4;
+  border-radius: 28rpx;
+  box-shadow: 0 10rpx 28rpx rgba(32, 35, 31, 0.055);
+}
+
+.activity-cover {
+  min-height: 248rpx;
+  padding: 36rpx;
+  background:
+    linear-gradient(135deg, rgba(78, 166, 200, 0.9), rgba(63, 111, 78, 0.78)),
+    radial-gradient(circle at 76% 28%, rgba(255, 255, 255, 0.45), transparent 22%);
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.activity-title {
+  display: block;
+  max-width: 420rpx;
+  font-size: 44rpx;
+  font-weight: 800;
+  line-height: 56rpx;
+}
+
+.activity-subtitle {
+  display: block;
+  margin-top: 12rpx;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 24rpx;
+  line-height: 34rpx;
+}
+
+.activity-content {
+  padding: 24rpx 28rpx 28rpx;
+}

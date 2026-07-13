@@ -1,0 +1,51 @@
+<view class="bb-page">
+  <view class="bb-hero">
+    <text class="bb-hero-title">宠物档案</text>
+    <text class="bb-hero-subtitle">预约前请补齐犬只健康、疫苗和行为信息</text>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">基础信息</text>
+    <view class="form-row">
+      <text class="form-label">犬只姓名</text>
+      <input class="form-input" placeholder="例如：奶茶" bindinput="onNameInput" />
+    </view>
+    <view class="form-row">
+      <text class="form-label">犬种</text>
+      <input class="form-input" placeholder="例如：柯基 / 贵宾 / 金毛" bindinput="onBreedInput" />
+    </view>
+    <view class="form-row">
+      <text class="form-label">体型</text>
+      <picker mode="selector" range="{{sizeOptions}}" bindchange="chooseSize">
+        <view class="form-picker">{{pet.size}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="bb-card">
+    <text class="bb-section-title">安全问询</text>
+    <view class="bb-list-item">
+      <text class="bb-body">是否首次入园</text>
+      <text class="bb-chip bb-chip-blue" bindtap="toggleFirstVisit">{{pet.firstVisit ? '是' : '否'}}</text>
+    </view>
+    <view class="bb-list-item">
+      <text class="bb-body">是否首次游泳</text>
+      <text class="bb-chip bb-chip-blue" bindtap="toggleFirstSwim">{{pet.firstSwim ? '是' : '否'}}</text>
+    </view>
+    <view class="bb-list-item">
+      <text class="bb-body">疫苗/犬证</text>
+      <text class="bb-chip bb-chip-gold" bindtap="markVaccineUploaded">{{pet.vaccineStatus}}</text>
+    </view>
+    <textarea
+      class="form-textarea"
+      placeholder="如有护食、扑人、骑跨、攻击、严重胆怯等情况，请提前说明"
+      bindinput="onBehaviorInput"
+    />
+  </view>
+
+  <view class="bb-warning">
+    幼犬、小型犬、首次游泳、不会游泳或游泳能力未确认的犬只，入水前必须穿宠物救生衣。
+  </view>
+
+  <button class="bb-button-primary" bindtap="savePet">保存宠物档案</button>
+</view>
